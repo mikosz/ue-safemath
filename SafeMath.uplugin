@@ -1,0 +1,28 @@
+﻿{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "SafeMath",
+	"Description": "Strongly typed math wrapper",
+	"Category": "Other",
+	"CreatedBy": "Mikołaj Radwan",
+	"CreatedByURL": "https://github.com/mikosz/ue-safemath",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "SafeMath",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "SafeMathTest",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	]
+}
