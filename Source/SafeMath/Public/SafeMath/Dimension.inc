@@ -38,9 +38,11 @@ template <class BaseDimensionAndExponentListType>
 constexpr auto Inverse(TDimension<BaseDimensionAndExponentListType> Dimension)
 {
 	using namespace Private::ConstexprList;
-	constexpr auto InverseBaseDimensionAndExponentListType = Transform(BaseDimensionAndExponentListType{},
-		[](auto Element) { return TDimensionEntry<typename decltype(Element)::BaseDimensionType, -Element.Exponent>{}; });
-	
+	constexpr auto InverseBaseDimensionAndExponentListType = Transform(
+		BaseDimensionAndExponentListType{},
+		[](auto Element)
+		{ return TDimensionEntry<typename decltype(Element)::BaseDimensionType, -Element.Exponent>{}; });
+
 	return TDimension<std::decay_t<decltype(InverseBaseDimensionAndExponentListType)>>{};
 }
 
@@ -52,20 +54,28 @@ constexpr auto operator/(
 }
 
 template <class LhsBaseDimensionAndExponentListType, class RhsBaseDimensionAndExponentListType>
-constexpr bool operator==(TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs)
+constexpr bool operator==(
+	TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs)
 {
 	using namespace Private;
-	
+
 	constexpr auto Quotient = Lhs / Rhs;
 	using QuotientType = std::decay_t<decltype(Quotient)>;
-	
+
 	return std::is_same_v<QuotientType, TDimension<TConstexprList<>>>;
 }
 
 template <class LhsBaseDimensionAndExponentListType, class RhsBaseDimensionAndExponentListType>
-constexpr bool operator!=(TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs)
+constexpr bool operator!=(
+	TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs)
 {
 	return !(Lhs == Rhs);
+}
+
+template <class BaseDimensionType, int Exponent>
+constexpr auto MakeDimension()
+{
+	return TDimension<Private::TConstexprList<TDimensionEntry<BaseDimensionType, Exponent>>>{};
 }
 
 }  // namespace SafeMath

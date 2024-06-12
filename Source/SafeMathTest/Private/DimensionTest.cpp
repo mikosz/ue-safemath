@@ -78,9 +78,9 @@ bool DimensionTest::RunTest(const FString& Parameters)
 
 		static_assert(!std::is_same_v<decltype(Force), decltype(Force2)>);
 		static_assert(Force == Force2);
-		// static_assert(!(Force != Force2));
-		// static_assert(!(Force == Speed));
-		// static_assert(Force != Speed);
+		static_assert(!(Force != Force2));
+		static_assert(!(Force == Speed));
+		static_assert(Force != Speed);
 	}
 
 	return true;
