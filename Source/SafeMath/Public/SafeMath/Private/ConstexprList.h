@@ -99,10 +99,37 @@ public:
 namespace ConstexprList
 {
 
+struct FNullElement
+{
+	explicit constexpr FNullElement(int)
+	{
+	}
+};
+
+constexpr auto NullElement = FNullElement{0};
+
+template <class T>
+constexpr bool IsNullElement(const T&)
+{
+	return std::is_same_v<T, FNullElement>;
+}
+
 template <class... EntryTypes>
 constexpr auto MakeConstexprList(EntryTypes... Entries)
 {
 	return TConstexprList<EntryTypes...>{std::move(Entries)...};
+}
+
+template <class T>
+constexpr bool IsConstexprList(T)
+{
+	return false;
+}
+
+template <class... EntryTypes>
+constexpr auto IsConstexprList(TConstexprList<EntryTypes...>)
+{
+	return true;
 }
 
 template <class... EntryTypes>
@@ -166,7 +193,7 @@ constexpr auto AllOf(TConstexprList<EntryTypes...> List, PredicateType Predicate
 template <class PredicateType>
 constexpr auto Find(TConstexprList<>, PredicateType Predicate)
 {
-	static_assert(AnyOf(TConstexprList{}, Predicate), "Element not found");
+	return NullElement;
 }
 
 template <class HeadType, class... TailTypes, class PredicateType>
@@ -183,21 +210,22 @@ constexpr auto Find([[maybe_unused]] TConstexprList<HeadType, TailTypes...> List
 }
 
 template <class PredicateType>
-constexpr auto Filter(TConstexprList<>, PredicateType)
+constexpr auto RemoveIf(TConstexprList<>, PredicateType)
 {
 	return TConstexprList{};
 }
 
 template <class HeadType, class... TailTypes, class PredicateType>
-constexpr auto Filter(TConstexprList<HeadType, TailTypes...> List, PredicateType Predicate)
+constexpr auto RemoveIf(TConstexprList<HeadType, TailTypes...> List, PredicateType Predicate)
 {
-	if constexpr (Predicate(HeadType{}))
+	// #TODO_astrosim: why if RemoveIf is consteval this can't still say List.GetHead()?
+	if constexpr (!Predicate(HeadType{}))
 	{
-		return Prepend(Filter(List.GetTail(), Predicate), List.GetHead());
+		return Prepend(RemoveIf(List.GetTail(), Predicate), List.GetHead());
 	}
 	else
 	{
-		return Filter(List.GetTail(), Predicate);
+		return RemoveIf(List.GetTail(), Predicate);
 	}
 }
 

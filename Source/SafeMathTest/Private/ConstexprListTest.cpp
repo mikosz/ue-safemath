@@ -27,6 +27,37 @@ constexpr bool operator==(FIntWrapper<I>, FIntWrapper<J>)
 	return I == J;
 }
 
+template <int I>
+struct FIntPredicate
+{
+	constexpr FIntPredicate() = default;
+
+	template <class T>
+	constexpr bool operator()(const T& Element) const
+	{
+		return Element == FIntWrapper<I>{};
+	}
+};
+
+template <class T>
+struct FTypePredicate
+{
+	constexpr FTypePredicate() = default;
+
+	template <class O>
+	constexpr bool operator()(const O&) const
+	{
+		return std::is_same_v<T, O>;
+	}
+};
+
+void IsConstexprListIsValid()
+{
+	static_assert(!IsConstexprList(42));
+	static_assert(IsConstexprList(TConstexprList{}));
+	static_assert(IsConstexprList(MakeConstexprList(42, 2.0, 'a')));
+}
+
 void ListOfEmptyElementsHasSize1()
 {
 	constexpr auto OneTwoThree = MakeConstexprList(FIntWrapper<1>{}, FIntWrapper<2>{}, FIntWrapper<3>{});
@@ -89,32 +120,29 @@ void ConcatenateMergesTwoLists()
 void FindReturnsMatchingElement()
 {
 	constexpr auto OneTwoThreeEmpty = TConstexprList<FIntWrapper<1>, FIntWrapper<2>, FIntWrapper<3>>{};
-	static_assert(Find(OneTwoThreeEmpty, [](auto Element) { return Element == FIntWrapper<1>{}; }) == FIntWrapper<1>{});
-	static_assert(Find(OneTwoThreeEmpty, [](auto Element) { return Element == FIntWrapper<2>{}; }) == FIntWrapper<2>{});
-	static_assert(Find(OneTwoThreeEmpty, [](auto Element) { return Element == FIntWrapper<3>{}; }) == FIntWrapper<3>{});
-	// Should not (and does not) compile with "Element not found" error
-	//Find(OneTwoThreeEmpty, [](auto Element) { return Element == FIntWrapper<4>{}; });
+	static_assert(Find(OneTwoThreeEmpty, FIntPredicate<1>{}) == FIntWrapper<1>{});
+	static_assert(Find(OneTwoThreeEmpty, FIntPredicate<2>{}) == FIntWrapper<2>{});
+	static_assert(Find(OneTwoThreeEmpty, FIntPredicate<3>{}) == FIntWrapper<3>{});
+	static_assert(IsNullElement(Find(OneTwoThreeEmpty, FIntPredicate<4>{})));
 
 	constexpr auto OneTwoThreeNonempty = MakeConstexprList(1, 2.0, 3.0f);
-	static_assert(Find(OneTwoThreeNonempty, [](auto Element) { return std::is_same_v<decltype(Element), int>; }) == 1);
-	static_assert(
-		Find(OneTwoThreeNonempty, [](auto Element) { return std::is_same_v<decltype(Element), double>; }) == 2.0);
-	static_assert(
-		Find(OneTwoThreeNonempty, [](auto Element) { return std::is_same_v<decltype(Element), float>; }) == 3.0f);
-	// Should not (and does not) compile with "Element not found" error
-	//Find(OneTwoThreeNonempty, [](auto Element) { return std::is_same_v<decltype(Element), char>; });
+
+	static_assert(Find(OneTwoThreeNonempty, FTypePredicate<int>{}) == 1);
+	static_assert(Find(OneTwoThreeNonempty, FTypePredicate<double>{}) == 2.0);
+	static_assert(Find(OneTwoThreeNonempty, FTypePredicate<float>{}) == 3.0f);
+	static_assert(IsNullElement(Find(OneTwoThreeNonempty, FTypePredicate<char>{})));
 }
 
 void FilterGetsElementsSatisfyingPredicate()
 {
 	constexpr auto OneTwoThreeFourEmpty =
 		MakeConstexprList(FIntWrapper<1>{}, FIntWrapper<2>{}, FIntWrapper<3>{}, FIntWrapper<4>{});
-	constexpr auto TwoFour = Filter(OneTwoThreeFourEmpty, [](auto Element) { return Element.Value % 2 == 0; });
+	constexpr auto TwoFour = RemoveIf(OneTwoThreeFourEmpty, [](auto Element) { return Element.Value % 2 != 0; });
 	static_assert(std::is_same_v<std::decay_t<decltype(TwoFour)>, TConstexprList<FIntWrapper<2>, FIntWrapper<4>>>);
 
 	constexpr auto OneTwoThreeFourNonempty = MakeConstexprList(1, 2.0, 3.0f);
 	constexpr auto TwoThree =
-		Filter(OneTwoThreeFourNonempty, [](auto Element) { return std::is_floating_point_v<decltype(Element)>; });
+		RemoveIf(OneTwoThreeFourNonempty, [](auto Element) { return !std::is_floating_point_v<decltype(Element)>; });
 	static_assert(GetElement<0>(TwoThree) == 2.0);
 	static_assert(GetElement<1>(TwoThree) == 3.0f);
 }
@@ -235,6 +263,7 @@ IMPLEMENT_COMPLEX_AUTOMATION_TEST(
 
 void ConstexprListTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FString>& OutTestCommands) const
 {
+	OutTestCommands.Emplace(TEXT("IsConstexprList"));
 	OutTestCommands.Emplace(TEXT("ListOfEmptyElementsHasSize1"));
 	OutTestCommands.Emplace(TEXT("ListOfUnemptyElementsHasSizeOfSumOfElements"));
 	OutTestCommands.Emplace(TEXT("PrependPutsElementsInFront"));
@@ -262,6 +291,10 @@ bool ConstexprListTest::RunTest(const FString& Parameters)
 {
 	using namespace SafeMath;
 
+	if (Parameters == TEXT("IsConstexprList"))
+	{
+		IsConstexprListIsValid();
+	}
 	if (Parameters == TEXT("ListOfEmptyElementsHasSize1"))
 	{
 		ListOfEmptyElementsHasSize1();
