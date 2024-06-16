@@ -16,11 +16,11 @@ void DimensionTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FString
 	Algo::Copy(OutTestCommands, OutBeautifiedNames);
 }
 
-bool DimensionTest::RunTest(const FString& Parameters)
+bool DimensionTest::RunTest(const FString& TestCommand)
 {
 	using namespace SafeMath;
 
-	if (Parameters == TEXT("MultiplicationMergesDimensions"))
+	if (TestCommand == TEXT("MultiplicationMergesDimensions"))
 	{
 		constexpr auto Mass = MakeDimension<BaseDimensions::FMass, 1>();
 		constexpr auto Time = MakeDimension<BaseDimensions::FTime, 1>();
@@ -28,8 +28,9 @@ bool DimensionTest::RunTest(const FString& Parameters)
 		constexpr auto MassTimeExpected = Private::ConstexprList::MakeConstexprList(
 			TDimensionEntry<BaseDimensions::FTime, 1>{}, TDimensionEntry<BaseDimensions::FMass, 1>{});
 
-		static_assert(
-			std::is_same_v<typename decltype(MassTime)::BaseDimensionAndExponentListType, std::decay_t<decltype(MassTimeExpected)>>);
+		static_assert(std::is_same_v<
+					  typename decltype(MassTime)::BaseDimensionAndExponentListType,
+					  std::decay_t<decltype(MassTimeExpected)>>);
 
 		constexpr auto InverseTime = MakeDimension<BaseDimensions::FTime, -1>();
 		constexpr auto Distance = MakeDimension<BaseDimensions::FDistance, 1>();
@@ -39,8 +40,9 @@ bool DimensionTest::RunTest(const FString& Parameters)
 			TDimensionEntry<BaseDimensions::FDistance, 1>{},
 			TDimensionEntry<BaseDimensions::FMass, 1>{});
 
-		static_assert(
-			std::is_same_v<typename decltype(Force)::BaseDimensionAndExponentListType, std::decay_t<decltype(ForceExpected)>>);
+		static_assert(std::is_same_v<
+					  typename decltype(Force)::BaseDimensionAndExponentListType,
+					  std::decay_t<decltype(ForceExpected)>>);
 
 		constexpr auto InverseMass = MakeDimension<BaseDimensions::FMass, -1>();
 		constexpr auto Acceleration = InverseMass * Force;
@@ -51,7 +53,7 @@ bool DimensionTest::RunTest(const FString& Parameters)
 					  typename decltype(Acceleration)::BaseDimensionAndExponentListType,
 					  std::decay_t<decltype(AccelerationExpected)>>);
 	}
-	else if (Parameters == TEXT("DivisionMergesDimensionsWithInverse"))
+	else if (TestCommand == TEXT("DivisionMergesDimensionsWithInverse"))
 	{
 		constexpr auto Mass = MakeDimension<BaseDimensions::FMass, 1>();
 		constexpr auto Distance = MakeDimension<BaseDimensions::FDistance, 1>();
@@ -63,10 +65,11 @@ bool DimensionTest::RunTest(const FString& Parameters)
 			TDimensionEntry<BaseDimensions::FMass, 1>{},
 			TDimensionEntry<BaseDimensions::FDistance, 1>{});
 
-		static_assert(
-			std::is_same_v<typename decltype(Force)::BaseDimensionAndExponentListType, std::decay_t<decltype(ForceExpected)>>);
+		static_assert(std::is_same_v<
+					  typename decltype(Force)::BaseDimensionAndExponentListType,
+					  std::decay_t<decltype(ForceExpected)>>);
 	}
-	else if (Parameters == TEXT("EqualityComparison"))
+	else if (TestCommand == TEXT("EqualityComparison"))
 	{
 		constexpr auto Mass = MakeDimension<BaseDimensions::FMass, 1>();
 		constexpr auto Distance = MakeDimension<BaseDimensions::FDistance, 1>();
@@ -81,6 +84,10 @@ bool DimensionTest::RunTest(const FString& Parameters)
 		static_assert(!(Force != Force2));
 		static_assert(!(Force == Speed));
 		static_assert(Force != Speed);
+	}
+	else
+	{
+		AddError("Unrecognized Test: " + TestCommand);
 	}
 
 	return true;

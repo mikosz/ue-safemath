@@ -39,13 +39,13 @@ struct TDimensionEntry
 
 // #TODO_astrosim move these two to Private?
 template <class T>
-constexpr bool IsDimensionEntry(T)
+consteval bool IsDimensionEntry(T)
 {
 	return false;
 }
 
 template <class BaseDimensionType, int Exponent>
-constexpr bool IsDimensionEntry(TDimensionEntry<BaseDimensionType, Exponent>)
+consteval bool IsDimensionEntry(TDimensionEntry<BaseDimensionType, Exponent>)
 {
 	return true;
 }
@@ -64,40 +64,33 @@ public:
 	TDimension() = default;
 };
 
-// #TODO_astrosim move these two to Private?
 template <class T>
-constexpr bool IsDimension(T)
-{
-	return false;
-}
+consteval bool IsDimension(T);
 
 template <class BaseDimensionAndExponentListType>
-constexpr bool IsDimension(TDimension<BaseDimensionAndExponentListType>)
-{
-	return true;
-}
+consteval bool IsDimension(TDimension<BaseDimensionAndExponentListType>);
 
 template <class LhsBaseDimensionAndExponentListType, class RhsBaseDimensionAndExponentListType>
-constexpr auto operator*(
+consteval auto operator*(
 	TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs);
 
 template <class BaseDimensionAndExponentListType>
-constexpr auto Inverse(TDimension<BaseDimensionAndExponentListType> Dimension);
+consteval auto Inverse(TDimension<BaseDimensionAndExponentListType> Dimension);
 
 template <class LhsBaseDimensionAndExponentListType, class RhsBaseDimensionAndExponentListType>
-constexpr auto operator/(
+consteval auto operator/(
 	TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs);
 
 template <class LhsBaseDimensionAndExponentListType, class RhsBaseDimensionAndExponentListType>
-constexpr bool operator==(
+consteval bool operator==(
 	TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs);
 
 template <class LhsBaseDimensionAndExponentListType, class RhsBaseDimensionAndExponentListType>
-constexpr bool operator!=(
+consteval bool operator!=(
 	TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs);
 
 template <class BaseDimensionType, int Exponent>
-constexpr auto MakeDimension();
+consteval auto MakeDimension();
 
 }  // namespace SafeMath
 

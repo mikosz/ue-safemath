@@ -5,8 +5,20 @@
 namespace SafeMath
 {
 
+template <class T>
+consteval bool IsDimension(T)
+{
+	return false;
+}
+
+template <class BaseDimensionAndExponentListType>
+consteval bool IsDimension(TDimension<BaseDimensionAndExponentListType>)
+{
+	return true;
+}
+
 template <class LhsBaseDimensionAndExponentListType, class RhsBaseDimensionAndExponentListType>
-constexpr auto operator*(
+consteval auto operator*(
 	TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs)
 {
 	using namespace Private::ConstexprList;
@@ -35,7 +47,7 @@ constexpr auto operator*(
 }
 
 template <class BaseDimensionAndExponentListType>
-constexpr auto Inverse(TDimension<BaseDimensionAndExponentListType> Dimension)
+consteval auto Inverse(TDimension<BaseDimensionAndExponentListType> Dimension)
 {
 	using namespace Private::ConstexprList;
 	constexpr auto InverseBaseDimensionAndExponentListType = Transform(
@@ -47,14 +59,14 @@ constexpr auto Inverse(TDimension<BaseDimensionAndExponentListType> Dimension)
 }
 
 template <class LhsBaseDimensionAndExponentListType, class RhsBaseDimensionAndExponentListType>
-constexpr auto operator/(
+consteval auto operator/(
 	TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs)
 {
 	return Lhs * Inverse(Rhs);
 }
 
 template <class LhsBaseDimensionAndExponentListType, class RhsBaseDimensionAndExponentListType>
-constexpr bool operator==(
+consteval bool operator==(
 	TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs)
 {
 	using namespace Private;
@@ -66,14 +78,14 @@ constexpr bool operator==(
 }
 
 template <class LhsBaseDimensionAndExponentListType, class RhsBaseDimensionAndExponentListType>
-constexpr bool operator!=(
+consteval bool operator!=(
 	TDimension<LhsBaseDimensionAndExponentListType> Lhs, TDimension<RhsBaseDimensionAndExponentListType> Rhs)
 {
 	return !(Lhs == Rhs);
 }
 
 template <class BaseDimensionType, int Exponent>
-constexpr auto MakeDimension()
+consteval auto MakeDimension()
 {
 	return TDimension<Private::TConstexprList<TDimensionEntry<BaseDimensionType, Exponent>>>{};
 }
