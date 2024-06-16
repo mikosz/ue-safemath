@@ -17,34 +17,33 @@ public:
 	static constexpr auto ConversionRate = InConversionRate;
 };
 
+template <class T>
+consteval bool IsUnit(T);
+
+template <class InDimensionType, double InConversionRate>
+consteval bool IsUnit(TUnit<InDimensionType, InConversionRate>);
+
 template <class LhsDimensionType, double LhsConversionRate, class RhsDimensionType, double RhsConversionRate>
-constexpr bool IsSameDimension(
-	TUnit<LhsDimensionType, LhsConversionRate> Lhs, TUnit<RhsDimensionType, RhsConversionRate> Rhs)
-{
-	return LhsDimensionType{} == RhsDimensionType{};
-}
+consteval bool IsSameDimension(
+	TUnit<LhsDimensionType, LhsConversionRate> Lhs, TUnit<RhsDimensionType, RhsConversionRate> Rhs);
 
 template <class FromDimensionType, double FromConversionRate, class ToDimensionType, double ToConversionRate>
-constexpr double GetConversionRateBetween(
-	TUnit<FromDimensionType, FromConversionRate> From, TUnit<ToDimensionType, ToConversionRate> To)
-{
-	static_assert(IsSameDimension(From, To));
-	return FromConversionRate / ToConversionRate;
-}
+consteval double GetConversionRateBetween(
+	TUnit<FromDimensionType, FromConversionRate> From, TUnit<ToDimensionType, ToConversionRate> To);
 
 template <class LhsDimensionType, double LhsConversionRate, class RhsDimensionType, double RhsConversionRate>
-constexpr auto operator*(TUnit<LhsDimensionType, LhsConversionRate> Lhs, TUnit<RhsDimensionType, RhsConversionRate> Rhs)
-{
-	return TUnit<decltype(LhsDimensionType{} * RhsDimensionType{}), LhsConversionRate * RhsConversionRate>{};
-}
+consteval auto operator*(
+	TUnit<LhsDimensionType, LhsConversionRate> Lhs, TUnit<RhsDimensionType, RhsConversionRate> Rhs);
 
 template <class LhsDimensionType, double LhsConversionRate, class RhsDimensionType, double RhsConversionRate>
-constexpr auto operator/(TUnit<LhsDimensionType, LhsConversionRate> Lhs, TUnit<RhsDimensionType, RhsConversionRate> Rhs)
-{
-	return TUnit<decltype(LhsDimensionType{} / RhsDimensionType{}), LhsConversionRate / RhsConversionRate>{};
-}
+consteval auto operator/(
+	TUnit<LhsDimensionType, LhsConversionRate> Lhs, TUnit<RhsDimensionType, RhsConversionRate> Rhs);
 
-namespace Units
+}  // namespace SafeMath
+
+#include "Unit.inc"
+
+namespace SafeMath::Units
 {
 
 using FDegrees = TUnit<Dimensions::FAngle, 1.>;
@@ -56,6 +55,10 @@ using FCentimeters = TUnit<Dimensions::FDistance, .01>;
 using FMeters = TUnit<Dimensions::FDistance, 1.>;
 using FKilometers = TUnit<Dimensions::FDistance, 1000.>;
 
+using FCentimetersSquared = decltype(FCentimeters{} * FCentimeters{});
+using FMetersSquared = decltype(FMeters{} * FMeters{});
+using FKilometersSquared = decltype(FKilometers{} * FKilometers{});
+
 using FSeconds = TUnit<Dimensions::FTime, 1.>;
 using FHours = TUnit<Dimensions::FTime, 60. * 60.>;
 
@@ -64,6 +67,4 @@ using FKilometersPerHour = decltype(FKilometers{} / FHours{});
 
 using FMetersPerSecondPerSecond = decltype(FMeters{} / FSeconds{} / FSeconds{});
 
-}  // namespace Units
-
-}  // namespace SafeMath
+}  // namespace SafeMath::Units

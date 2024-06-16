@@ -287,89 +287,93 @@ void ConstexprListTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FSt
 	Algo::Copy(OutTestCommands, OutBeautifiedNames);
 }
 
-bool ConstexprListTest::RunTest(const FString& Parameters)
+bool ConstexprListTest::RunTest(const FString& TestCommand)
 {
 	using namespace SafeMath;
 
-	if (Parameters == TEXT("IsConstexprList"))
+	if (TestCommand == TEXT("IsConstexprList"))
 	{
 		IsConstexprListIsValid();
 	}
-	if (Parameters == TEXT("ListOfEmptyElementsHasSize1"))
+	else if (TestCommand == TEXT("ListOfEmptyElementsHasSize1"))
 	{
 		ListOfEmptyElementsHasSize1();
 	}
-	else if (Parameters == TEXT("ListOfUnemptyElementsHasSizeOfSumOfElements"))
+	else if (TestCommand == TEXT("ListOfUnemptyElementsHasSizeOfSumOfElements"))
 	{
 		ListOfUnemptyElementsHasSizeOfSumOfElements();
 	}
-	else if (Parameters == TEXT("PrependPutsElementsInFront"))
+	else if (TestCommand == TEXT("PrependPutsElementsInFront"))
 	{
 		PrependPutsElementsInFront();
 	}
-	else if (Parameters == TEXT("MakeConstexprListInsertsAllElements"))
+	else if (TestCommand == TEXT("MakeConstexprListInsertsAllElements"))
 	{
 		MakeConstexprListInsertsAllElements();
 	}
-	else if (Parameters == TEXT("ConcatenateMergesTwoLists"))
+	else if (TestCommand == TEXT("ConcatenateMergesTwoLists"))
 	{
 		ConcatenateMergesTwoLists();
 	}
-	else if (Parameters == TEXT("FindReturnsMatchingElement"))
+	else if (TestCommand == TEXT("FindReturnsMatchingElement"))
 	{
 		FindReturnsMatchingElement();
 	}
-	else if (Parameters == TEXT("FilterGetsElementsSatisfyingPredicate"))
+	else if (TestCommand == TEXT("FilterGetsElementsSatisfyingPredicate"))
 	{
 		FilterGetsElementsSatisfyingPredicate();
 	}
-	else if (Parameters == TEXT("TransformReturnsListWithTransformedElements"))
+	else if (TestCommand == TEXT("TransformReturnsListWithTransformedElements"))
 	{
 		TransformReturnsListWithTransformedElements();
 	}
-	else if (Parameters == TEXT("ContainsReturnsTrueIfListContainsElement"))
+	else if (TestCommand == TEXT("ContainsReturnsTrueIfListContainsElement"))
 	{
 		ContainsReturnsTrueIfListContainsElement();
 	}
-	else if (Parameters == TEXT("EmptyReturnsTrueIfListIsEmpty"))
+	else if (TestCommand == TEXT("EmptyReturnsTrueIfListIsEmpty"))
 	{
 		EmptyReturnsTrueIfListIsEmpty();
 	}
-	else if (Parameters == TEXT("HasDuplicatesReturnsTrueIfListContainsDuplicates"))
+	else if (TestCommand == TEXT("HasDuplicatesReturnsTrueIfListContainsDuplicates"))
 	{
 		HasDuplicatesReturnsTrueIfListContainsDuplicates();
 	}
-	else if (Parameters == TEXT("AnyOfReturnsTrueIfElementsSatisfyingPredicateExists"))
+	else if (TestCommand == TEXT("AnyOfReturnsTrueIfElementsSatisfyingPredicateExists"))
 	{
 		AnyOfReturnsTrueIfElementsSatisfyingPredicateExists();
 	}
-	else if (Parameters == TEXT("AllOfReturnsTrueIfNoElementNotSatisfyingPredicateExists"))
+	else if (TestCommand == TEXT("AllOfReturnsTrueIfNoElementNotSatisfyingPredicateExists"))
 	{
 		AllOfReturnsTrueIfNoElementNotSatisfyingPredicateExists();
 	}
-	else if (Parameters == TEXT("FlattenCreatesAFlatList"))
+	else if (TestCommand == TEXT("FlattenCreatesAFlatList"))
 	{
 		FlattenCreatesAFlatList();
 	}
-	else if (Parameters == TEXT("FoldLeftCallsFunctorFoldingLeft"))
+	else if (TestCommand == TEXT("FoldLeftCallsFunctorFoldingLeft"))
 	{
 		FoldLeftCallsFunctorFoldingLeft();
 	}
-	else if (Parameters == TEXT("FoldLeftReturnsInitIfListEmpty"))
+	else if (TestCommand == TEXT("FoldLeftReturnsInitIfListEmpty"))
 	{
 		FoldLeftReturnsInitIfListEmpty();
 	}
-	else if (Parameters == TEXT("UnpackCallsFunctionPassingAllElements"))
+	else if (TestCommand == TEXT("UnpackCallsFunctionPassingAllElements"))
 	{
 		UnpackCallsFunctionPassingAllElements();
 	}
-	else if (Parameters == TEXT("IsSubsetReturnsTrueIfRhsContainsAllElementsOfLhs"))
+	else if (TestCommand == TEXT("IsSubsetReturnsTrueIfRhsContainsAllElementsOfLhs"))
 	{
 		IsSubsetReturnsTrueIfRhsContainsAllElementsOfLhs();
 	}
-	else if (Parameters == TEXT("DifferenceReturnsLhsMinusRhs"))
+	else if (TestCommand == TEXT("DifferenceReturnsLhsMinusRhs"))
 	{
 		DifferenceReturnsLhsMinusRhs();
+	}
+	else
+	{
+		AddError("Unrecognized Test: " + TestCommand);
 	}
 
 	return true;

@@ -18,11 +18,11 @@ void UnitTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FString>& Ou
 	Algo::Copy(OutTestCommands, OutBeautifiedNames);
 }
 
-bool UnitTest::RunTest(const FString& Parameters)
+bool UnitTest::RunTest(const FString& TestCommand)
 {
 	using namespace SafeMath;
 
-	if (Parameters == TEXT("Multiplication"))
+	if (TestCommand == TEXT("Multiplication"))
 	{
 		constexpr auto CentimeterHours = Units::FCentimeters{} * Units::FHours{};
 		static_assert(std::is_same_v<
@@ -30,23 +30,27 @@ bool UnitTest::RunTest(const FString& Parameters)
 					  decltype(Dimensions::FDistance{} * Dimensions::FTime{})>);
 		TestNearlyEqual("CentimeterHoursConversionRate", CentimeterHours.ConversionRate, .01 * 3600.);
 	}
-	else if (Parameters == TEXT("Division"))
+	else if (TestCommand == TEXT("Division"))
 	{
 		constexpr auto CentimetersPerHour = Units::FCentimeters{} / Units::FHours{};
 		static_assert(std::is_same_v<std::decay_t<decltype(CentimetersPerHour)::DimensionType>, Dimensions::FVelocity>);
 		TestNearlyEqual("CentimetersPerHourConversionRate", CentimetersPerHour.ConversionRate, .01 / 3600.);
 	}
-	else if (Parameters == TEXT("IsSameDimension"))
+	else if (TestCommand == TEXT("IsSameDimension"))
 	{
 		static_assert(IsSameDimension(Units::FKilometersPerHour{}, Units::FMetersPerSecond{}));
 		static_assert(!IsSameDimension(Units::FMetersPerSecondPerSecond{}, Units::FMetersPerSecond{}));
 	}
-	else if (Parameters == TEXT("GetConversionRateBetween"))
+	else if (TestCommand == TEXT("GetConversionRateBetween"))
 	{
 		TestNearlyEqual(
 			"MPSToKPH", GetConversionRateBetween(Units::FMetersPerSecond{}, Units::FKilometersPerHour{}), 3.6);
 		TestNearlyEqual(
 			"KPHToMPS", GetConversionRateBetween(Units::FKilometersPerHour{}, Units::FMetersPerSecond{}), 1. / 3.6);
+	}
+	else
+	{
+		AddError("Unrecognized Test: " + TestCommand);
 	}
 
 	return true;
