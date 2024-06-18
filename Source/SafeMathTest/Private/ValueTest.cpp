@@ -1,5 +1,5 @@
 ﻿#include "Misc/AutomationTest.h"
-#include "SafeMath/Value.h"
+#include "SafeMath/Quantity.h"
 
 #include <type_traits>
 
@@ -28,11 +28,11 @@ bool ValueTest::RunTest(const FString& TestCommand)
 
 	if (TestCommand == TEXT("GetValue"))
 	{
-		constexpr auto Length = TValue{Units::FCentimeters{}, 100};
+		constexpr auto Length = TQuantity{Units::FCentimeters{}, 100};
 		static_assert(Length.GetValue<Units::FCentimeters>() == 100);
 		static_assert(Length.GetValue<Units::FMeters>() == 1);
 
-		const auto Direction = TValue{Units::FMeters{}, FVector{1., 2., 3.}};
+		const auto Direction = TQuantity{Units::FMeters{}, FVector{1., 2., 3.}};
 		TestNearlyEqual("Vector GetValue", Direction.GetValue<Units::FCentimeters>(), FVector{100., 200., 300.});
 
 		// GetValue should not compile for different dimensions
@@ -40,12 +40,12 @@ bool ValueTest::RunTest(const FString& TestCommand)
 	}
 	else if (TestCommand == TEXT("Comparison"))
 	{
-		constexpr auto Length = TValue{Units::FCentimeters{}, 2'000.};
-		constexpr auto LengthGreater = TValue{Units::FMeters{}, 21.};
-		constexpr auto LengthEqual = TValue{Units::FKilometers{}, 0.02};
+		constexpr auto Length = TQuantity{Units::FCentimeters{}, 2'000.};
+		constexpr auto LengthGreater = TQuantity{Units::FMeters{}, 21.};
+		constexpr auto LengthEqual = TQuantity{Units::FKilometers{}, 0.02};
 
 		// ReSharper disable CppRedundantComplexityInComparison
-		constexpr auto LengthI = TValue{Units::FMeters{}, 20};
+		constexpr auto LengthI = TQuantity{Units::FMeters{}, 20};
 		// Equality tests for int only
 		static_assert(LengthI == Length);
 		static_assert(!(LengthI != Length));
@@ -76,12 +76,16 @@ bool ValueTest::RunTest(const FString& TestCommand)
 		static_assert(LengthGreater >= Length);
 		static_assert(!(LengthGreater < Length));
 		static_assert(LengthGreater > Length);
+
+		const auto Direction = TQuantity{Units::FMeters{}, FVector{1., 2., 3.}};
+		TestTrue(
+			"Vector NearlyEqual", NearlyEqual(Direction.GetValue<Units::FCentimeters>(), FVector{100., 200., 300.}));
 		// ReSharper restore CppRedundantComplexityInComparison
 	}
 	else if (TestCommand == TEXT("Multiplication"))
 	{
-		constexpr auto LengthA = TValue{Units::FMeters{}, 20.f};
-		constexpr auto LengthB = TValue{Units::FCentimeters{}, 50.f};
+		constexpr auto LengthA = TQuantity{Units::FMeters{}, 20.f};
+		constexpr auto LengthB = TQuantity{Units::FCentimeters{}, 50.f};
 		constexpr auto AreaAB = LengthA * LengthB;
 		constexpr auto AreaBA = LengthB * LengthA;
 
@@ -93,16 +97,16 @@ bool ValueTest::RunTest(const FString& TestCommand)
 	}
 	else if (TestCommand == TEXT("Division"))
 	{
-		constexpr auto Distance = TValue{Units::FMeters{}, 20.};
-		constexpr auto Time = TValue{Units::FSeconds{}, 5.};
+		constexpr auto Distance = TQuantity{Units::FMeters{}, 20.};
+		constexpr auto Time = TQuantity{Units::FSeconds{}, 5.};
 		constexpr auto Velocity = Distance / Time;
 		static_assert(NearlyEqual(Velocity.GetValue<Units::FMetersPerSecond>(), 4.));
 		static_assert(NearlyEqual(Velocity.GetValue<Units::FKilometersPerHour>(), 14.4));
 	}
 	else if (TestCommand == TEXT("Addition"))
 	{
-		constexpr auto LengthA = TValue{Units::FMeters{}, 20.};
-		constexpr auto LengthB = TValue{Units::FCentimeters{}, 50.};
+		constexpr auto LengthA = TQuantity{Units::FMeters{}, 20.};
+		constexpr auto LengthB = TQuantity{Units::FCentimeters{}, 50.};
 		constexpr auto SumAB = LengthA + LengthB;
 		constexpr auto SumBA = LengthB + LengthA;
 
@@ -122,8 +126,8 @@ bool ValueTest::RunTest(const FString& TestCommand)
 	}
 	else if (TestCommand == TEXT("Subtraction"))
 	{
-		constexpr auto LengthA = TValue{Units::FMeters{}, 20.};
-		constexpr auto LengthB = TValue{Units::FCentimeters{}, 50.};
+		constexpr auto LengthA = TQuantity{Units::FMeters{}, 20.};
+		constexpr auto LengthB = TQuantity{Units::FCentimeters{}, 50.};
 		constexpr auto SumAB = LengthA - LengthB;
 		constexpr auto SumBA = LengthB - LengthA;
 
@@ -143,7 +147,7 @@ bool ValueTest::RunTest(const FString& TestCommand)
 	}
 	else if (TestCommand == TEXT("MultiplicationByScalar"))
 	{
-		constexpr auto Length = TValue{Units::FMeters{}, 42};
+		constexpr auto Length = TQuantity{Units::FMeters{}, 42};
 
 		static_assert((Length * 2).GetValue<Units::FMeters>() == 84);
 		static_assert((2 * Length).GetValue<Units::FMeters>() == 84);
@@ -154,7 +158,7 @@ bool ValueTest::RunTest(const FString& TestCommand)
 	}
 	else if (TestCommand == TEXT("DivisionByScalar"))
 	{
-		constexpr auto Length = TValue{Units::FMeters{}, 42};
+		constexpr auto Length = TQuantity{Units::FMeters{}, 42};
 
 		static_assert((Length / 2).GetValue<Units::FMeters>() == 21);
 

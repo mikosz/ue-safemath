@@ -6,7 +6,7 @@ namespace SafeMath
 {
 
 template <class InUnitType, class InValueType>
-constexpr TValue<InUnitType, InValueType>::TValue(UnitType, ValueType InValue) : Value{InValue}
+constexpr TQuantity<InUnitType, InValueType>::TQuantity(UnitType, ValueType InValue) : Value{InValue}
 {
 }
 
@@ -30,7 +30,7 @@ constexpr bool NearlyEqual(const UE::Math::TVector<T>& Lhs, const UE::Math::TVec
 }
 
 template <class LhsUnitType, class LhsValueType, class RhsUnitType, class RhsValueType>
-constexpr bool NearlyEqual(const TValue<LhsUnitType, LhsValueType>& Lhs, const TValue<RhsUnitType, RhsValueType>& Rhs)
+constexpr bool NearlyEqual(const TQuantity<LhsUnitType, LhsValueType>& Lhs, const TQuantity<RhsUnitType, RhsValueType>& Rhs)
 {
 	return NearlyEqual(Lhs.template GetValue<LhsUnitType>(), Rhs.template GetValue<LhsUnitType>());
 }
@@ -39,7 +39,7 @@ constexpr bool NearlyEqual(const TValue<LhsUnitType, LhsValueType>& Lhs, const T
 // to precision errors when using with floats, doubles etc. Use NearlyEqual equality comparison the same way
 // you would with built-in types.
 template <class LhsUnitType, class LhsValueType, class RhsUnitType, class RhsValueType>
-constexpr auto operator==(const TValue<LhsUnitType, LhsValueType>& Lhs, const TValue<RhsUnitType, RhsValueType>& Rhs)
+constexpr auto operator==(const TQuantity<LhsUnitType, LhsValueType>& Lhs, const TQuantity<RhsUnitType, RhsValueType>& Rhs)
 {
 	// #TODO_astrosim: taking argument using concept should yield a nicer error message and should be probably more
 	// compact, explore.
@@ -48,63 +48,63 @@ constexpr auto operator==(const TValue<LhsUnitType, LhsValueType>& Lhs, const TV
 }
 
 template <class LhsUnitType, class LhsValueType, class RhsUnitType, class RhsValueType>
-constexpr auto operator!=(const TValue<LhsUnitType, LhsValueType>& Lhs, const TValue<RhsUnitType, RhsValueType>& Rhs)
+constexpr auto operator!=(const TQuantity<LhsUnitType, LhsValueType>& Lhs, const TQuantity<RhsUnitType, RhsValueType>& Rhs)
 {
 	static_assert(IsSameDimension(LhsUnitType{}, RhsUnitType{}));
 	return Lhs.template GetValue<LhsUnitType>() != Rhs.template GetValue<LhsUnitType>();
 }
 
 template <class LhsUnitType, class LhsValueType, class RhsUnitType, class RhsValueType>
-constexpr auto operator<(const TValue<LhsUnitType, LhsValueType>& Lhs, const TValue<RhsUnitType, RhsValueType>& Rhs)
+constexpr auto operator<(const TQuantity<LhsUnitType, LhsValueType>& Lhs, const TQuantity<RhsUnitType, RhsValueType>& Rhs)
 {
 	static_assert(IsSameDimension(LhsUnitType{}, RhsUnitType{}));
 	return Lhs.template GetValue<LhsUnitType>() < Rhs.template GetValue<LhsUnitType>();
 }
 
 template <class LhsUnitType, class LhsValueType, class RhsUnitType, class RhsValueType>
-constexpr auto operator<=(const TValue<LhsUnitType, LhsValueType>& Lhs, const TValue<RhsUnitType, RhsValueType>& Rhs)
+constexpr auto operator<=(const TQuantity<LhsUnitType, LhsValueType>& Lhs, const TQuantity<RhsUnitType, RhsValueType>& Rhs)
 {
 	static_assert(IsSameDimension(LhsUnitType{}, RhsUnitType{}));
 	return Lhs.template GetValue<LhsUnitType>() <= Rhs.template GetValue<LhsUnitType>();
 }
 
 template <class LhsUnitType, class LhsValueType, class RhsUnitType, class RhsValueType>
-constexpr auto operator>(const TValue<LhsUnitType, LhsValueType>& Lhs, const TValue<RhsUnitType, RhsValueType>& Rhs)
+constexpr auto operator>(const TQuantity<LhsUnitType, LhsValueType>& Lhs, const TQuantity<RhsUnitType, RhsValueType>& Rhs)
 {
 	static_assert(IsSameDimension(LhsUnitType{}, RhsUnitType{}));
 	return Lhs.template GetValue<LhsUnitType>() > Rhs.template GetValue<LhsUnitType>();
 }
 
 template <class LhsUnitType, class LhsValueType, class RhsUnitType, class RhsValueType>
-constexpr auto operator>=(const TValue<LhsUnitType, LhsValueType>& Lhs, const TValue<RhsUnitType, RhsValueType>& Rhs)
+constexpr auto operator>=(const TQuantity<LhsUnitType, LhsValueType>& Lhs, const TQuantity<RhsUnitType, RhsValueType>& Rhs)
 {
 	static_assert(IsSameDimension(LhsUnitType{}, RhsUnitType{}));
 	return Lhs.template GetValue<LhsUnitType>() >= Rhs.template GetValue<LhsUnitType>();
 }
 
 template <class LhsUnitType, class LhsValueType, class RhsUnitType, class RhsValueType>
-constexpr auto operator*(const TValue<LhsUnitType, LhsValueType>& Lhs, const TValue<RhsUnitType, RhsValueType>& Rhs)
+constexpr auto operator*(const TQuantity<LhsUnitType, LhsValueType>& Lhs, const TQuantity<RhsUnitType, RhsValueType>& Rhs)
 {
-	return TValue{
+	return TQuantity{
 		LhsUnitType{} * RhsUnitType{}, Lhs.template GetValue<LhsUnitType>() * Rhs.template GetValue<RhsUnitType>()};
 }
 
 template <class LhsUnitType, class LhsValueType, class RhsUnitType, class RhsValueType>
-constexpr auto operator/(const TValue<LhsUnitType, LhsValueType>& Lhs, const TValue<RhsUnitType, RhsValueType>& Rhs)
+constexpr auto operator/(const TQuantity<LhsUnitType, LhsValueType>& Lhs, const TQuantity<RhsUnitType, RhsValueType>& Rhs)
 {
-	return TValue{
+	return TQuantity{
 		LhsUnitType{} / RhsUnitType{}, Lhs.template GetValue<LhsUnitType>() / Rhs.template GetValue<RhsUnitType>()};
 }
 
 template <class LhsUnitType, class RhsUnitType, class ValueType>
-constexpr auto operator+(const TValue<LhsUnitType, ValueType>& Lhs, const TValue<RhsUnitType, ValueType>& Rhs)
+constexpr auto operator+(const TQuantity<LhsUnitType, ValueType>& Lhs, const TQuantity<RhsUnitType, ValueType>& Rhs)
 {
 	static_assert(IsSameDimension(LhsUnitType{}, RhsUnitType{}));
-	return TValue{LhsUnitType{}, Lhs.template GetValue<LhsUnitType>() + Rhs.template GetValue<LhsUnitType>()};
+	return TQuantity{LhsUnitType{}, Lhs.template GetValue<LhsUnitType>() + Rhs.template GetValue<LhsUnitType>()};
 }
 
 template <class LhsUnitType, class RhsUnitType, class ValueType>
-constexpr auto operator-(const TValue<LhsUnitType, ValueType>& Lhs, const TValue<RhsUnitType, ValueType>& Rhs)
+constexpr auto operator-(const TQuantity<LhsUnitType, ValueType>& Lhs, const TQuantity<RhsUnitType, ValueType>& Rhs)
 {
 	static_assert(IsSameDimension(LhsUnitType{}, RhsUnitType{}));
 	return Lhs + (-Rhs);
@@ -112,23 +112,23 @@ constexpr auto operator-(const TValue<LhsUnitType, ValueType>& Lhs, const TValue
 
 template <class UnitType, class ValueType>
 constexpr auto operator*(
-	const TValue<UnitType, ValueType>& Value, typename TValue<UnitType, ValueType>::ScalarType Scalar)
+	const TQuantity<UnitType, ValueType>& Value, typename TQuantity<UnitType, ValueType>::ScalarType Scalar)
 {
-	return TValue{UnitType{}, Value.template GetValue<UnitType>() * Scalar};
+	return TQuantity{UnitType{}, Value.template GetValue<UnitType>() * Scalar};
 }
 
 template <class UnitType, class ValueType>
 constexpr auto operator*(
-	typename TValue<UnitType, ValueType>::ScalarType Scalar, const TValue<UnitType, ValueType>& Value)
+	typename TQuantity<UnitType, ValueType>::ScalarType Scalar, const TQuantity<UnitType, ValueType>& Value)
 {
 	return Value * Scalar;
 }
 
 template <class UnitType, class ValueType>
 constexpr auto operator/(
-	const TValue<UnitType, ValueType>& Value, typename TValue<UnitType, ValueType>::ScalarType Scalar)
+	const TQuantity<UnitType, ValueType>& Value, typename TQuantity<UnitType, ValueType>::ScalarType Scalar)
 {
-	return TValue{UnitType{}, Value.template GetValue<UnitType>() / Scalar};
+	return TQuantity{UnitType{}, Value.template GetValue<UnitType>() / Scalar};
 }
 
 }  // namespace SafeMath
