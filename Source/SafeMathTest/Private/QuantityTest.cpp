@@ -1,5 +1,6 @@
 ﻿#include "Misc/AutomationTest.h"
 #include "SafeMath/Quantity.h"
+#include "SafeMath/Utils.h"
 
 #include <type_traits>
 
@@ -7,9 +8,9 @@ namespace SafeMath::Test
 {
 
 IMPLEMENT_COMPLEX_AUTOMATION_TEST(
-	ValueTest, "SafeMath.ValueTest", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+	QuantityTest, "SafeMath.QuantityTest", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
-void ValueTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FString>& OutTestCommands) const
+void QuantityTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FString>& OutTestCommands) const
 {
 	OutTestCommands.Emplace(TEXT("GetValue"));
 	OutTestCommands.Emplace(TEXT("Comparison"));
@@ -22,7 +23,7 @@ void ValueTest::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FString>& O
 	Algo::Copy(OutTestCommands, OutBeautifiedNames);
 }
 
-bool ValueTest::RunTest(const FString& TestCommand)
+bool QuantityTest::RunTest(const FString& TestCommand)
 {
 	using namespace SafeMath;
 
@@ -89,11 +90,11 @@ bool ValueTest::RunTest(const FString& TestCommand)
 		constexpr auto AreaAB = LengthA * LengthB;
 		constexpr auto AreaBA = LengthB * LengthA;
 
-		static_assert(NearlyEqual(AreaAB.GetValue<Units::FMetersSquared>(), 10.f));
-		static_assert(NearlyEqual(AreaAB.GetValue<Units::FCentimetersSquared>(), 100'000.f));
+		static_assert(NearlyEqual(AreaAB.GetValue<Units::FMetersSquared>(), 10.));
+		static_assert(NearlyEqual(AreaAB.GetValue<Units::FCentimetersSquared>(), 100'000.));
 
-		static_assert(NearlyEqual(AreaBA.GetValue<Units::FMetersSquared>(), 10.f));
-		static_assert(NearlyEqual(AreaBA.GetValue<Units::FCentimetersSquared>(), 100'000.f));
+		static_assert(NearlyEqual(AreaBA.GetValue<Units::FMetersSquared>(), 10.));
+		static_assert(NearlyEqual(AreaBA.GetValue<Units::FCentimetersSquared>(), 100'000.));
 	}
 	else if (TestCommand == TEXT("Division"))
 	{

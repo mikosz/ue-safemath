@@ -1,0 +1,93 @@
+// #TODO_dontcommit: add copyright everywhere (to file template also)
+#pragma once
+
+// #TODO_dontcommit: why the filename?
+// #TODO_dontcommit: unreal types should be in a separate plugin I think. Others could just be in a third-party project
+
+#include "Quantity.decl.h"
+#include "Unit.h"
+
+#include <variant>
+
+#include "quantity.generated.h"
+
+{% for quantity in quantities %}
+
+{% set cap_quantity = quantity.name|capitalize %}
+
+UENUM()
+enum class E{{ cap_quantity }}Unit : uint8
+{
+    {% for unit in quantity.units %}
+    {{ unit.name|capitalize }},
+    {% endfor %}
+};
+
+template <class {{ cap_quantity }}Unit>
+struct F{{ cap_quantity }}UnitTraits;
+
+{% for unit in quantity.units %}
+template <>
+struct F{{ cap_quantity }}UnitTraits<SafeMath::Units::F{{ unit.name|capitalize }}>
+{
+	constexpr static E{{ cap_quantity }}Unit {{ cap_quantity }}Unit = E{{ cap_quantity }}Unit::{{ unit.name|capitalize }};
+
+	inline static const TCHAR* Suffix = TEXT("{{ unit.suffix }}");
+};
+{% endfor %}
+
+using F{{ cap_quantity }}Unit = std::variant<
+{% for unit in quantity.units %}
+    SafeMath::Units::F{{ unit.name|capitalize }}{% if not loop.last %},{% endif %}
+{% endfor %}
+>;
+
+constexpr F{{ cap_quantity }}Unit Get{{ cap_quantity }}Unit(const E{{ cap_quantity }}Unit {{ cap_quantity }}Unit)
+{
+	switch ({{ cap_quantity }}Unit)
+	{
+{% for unit in quantity.units %}
+        case E{{ cap_quantity }}Unit::{{ unit.name|capitalize }}:
+			return F{{ cap_quantity }}Unit{ SafeMath::Units::F{{ unit.name|capitalize }}{} };
+{% endfor %}
+        // #TODO_dontcommit: default case
+	}
+}
+
+USTRUCT()
+struct F{{ cap_quantity }} 
+{
+	GENERATED_BODY()
+
+	using DefaultUnitType = SafeMath::Units::F{{ quantity.default_unit_type|capitalize }};
+
+	using QuantityType = SafeMath::TQuantity<DefaultUnitType, double>;
+
+	F{{ cap_quantity }}() = default;
+
+	F{{ cap_quantity }}(QuantityType InValue) : Value(InValue.GetValue<DefaultUnitType>())
+	{
+	}
+
+	operator QuantityType() const
+	{
+		return GetValue();
+	}
+
+	QuantityType GetValue() const
+	{
+		return QuantityType{DefaultUnitType{}, Value};
+	}
+
+private:
+	// Always internally stored in default dimension unit (conversion rate == 1)
+	UPROPERTY(EditAnywhere)
+	double Value = 0.;
+
+#if WITH_EDITORONLY_DATA
+	UPROPERTY()
+	E{{ cap_quantity }}Unit SelectedUnit = F{{ cap_quantity }}UnitTraits<DefaultUnitType>::{{ cap_quantity }}Unit;
+#endif
+};
+
+{% endfor %}

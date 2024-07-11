@@ -1,0 +1,1 @@
+﻿#include "SafeMath/TypedDouble.h"

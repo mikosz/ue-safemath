@@ -49,6 +49,7 @@ namespace SafeMath::Units
 using FDegrees = TUnit<Dimensions::FAngle, 1.>;
 using FRadians = TUnit<Dimensions::FAngle, 180. / UE_DOUBLE_PI>;
 
+using FGrams = TUnit<Dimensions::FMass, .001>;
 using FKilograms = TUnit<Dimensions::FMass, 1.>;
 
 using FCentimeters = TUnit<Dimensions::FDistance, .01>;

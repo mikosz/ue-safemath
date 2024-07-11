@@ -1,0 +1,36 @@
+{
+  "quantities": [
+    {
+      "name": "length",
+      "default_unit_type": "centimeters",
+      "units": [
+        {
+          "name": "centimeters",
+          "suffix": "cm"
+        },
+        {
+          "name": "meters",
+          "suffix": "m"
+        },
+        {
+          "name": "kilometers",
+          "suffix": "km"
+        }
+      ]
+    },
+    {
+      "name": "mass",
+      "default_unit_type": "kilograms",
+      "units": [
+        {
+          "name": "grams",
+          "suffix": "g"
+        },
+        {
+          "name": "kilograms",
+          "suffix": "kg"
+        }
+      ]
+    }
+  ]
+}
