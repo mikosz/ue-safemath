@@ -13,5 +13,13 @@ class AActorWithQuantities : public AActor
 public:
 	UPROPERTY(EditAnywhere)
 	FLength Length;
+
+	UPROPERTY(EditAnywhere)
+	FMass Mass;
+
+	UPROPERTY(EditAnywhere)
+	FAcceleration Acceleration;
+
+	UPROPERTY(EditAnywhere)
+	FArea Area;
 };
- 

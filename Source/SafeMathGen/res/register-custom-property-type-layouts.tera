@@ -1,0 +1,22 @@
+#pragma once
+
+#include "CoreMinimal.h"
+
+#include "QuantityCustomization.h"
+#include "SafeMath/Quantity.h"
+#include "SafeMath/Unit.h"
+
+namespace SafeMath::Editor
+{
+
+void RegisterCustomPropertyTypeLayouts(FPropertyEditorModule& PropertyModule)
+{
+{% for quantity in quantities %}
+{% set cap_quantity = quantity.name|capitalize %}    
+    PropertyModule.RegisterCustomPropertyTypeLayout(
+    	F{{ cap_quantity }}::StaticStruct()->GetFName(),
+    	FOnGetPropertyTypeCustomizationInstance::CreateStatic(FQuantityCustomization<F{{ cap_quantity }}>::MakeInstance));
+{% endfor %}
+}
+
+}  // namespace SafeMath::Editor

@@ -23,6 +23,11 @@
 			"Name": "SafeMathTest",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "SafeMathEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	]
 }

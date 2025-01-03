@@ -1,6 +1,20 @@
 {
   "quantities": [
     {
+      "name": "angle",
+      "default_unit_type": "degrees",
+      "units": [
+        {
+          "name": "degrees",
+          "suffix": "deg"
+        },
+        {
+          "name": "radians",
+          "suffix": "rad"
+        }
+      ]
+    },
+    {
       "name": "length",
       "default_unit_type": "centimeters",
       "units": [
@@ -29,6 +43,58 @@
         {
           "name": "kilograms",
           "suffix": "kg"
+        }
+      ]
+    },
+    {
+      "name": "area",
+      "default_unit_type": "centimeters-squared",
+      "units": [
+        {
+          "name": "centimeters-squared",
+          "suffix": "cm^2"
+        },
+        {
+          "name": "meters-squared",
+          "suffix": "m^2"
+        }
+      ]
+    },
+    {
+      "name": "time",
+      "default_unit_type": "seconds",
+      "units": [
+        {
+          "name": "seconds",
+          "suffix": "s"
+        },
+        {
+          "name": "hours",
+          "suffix": "h"
+        }
+      ]
+    },
+    {
+      "name": "speed",
+      "default_unit_type": "meters-per-second",
+      "units": [
+        {
+          "name": "meters-per-second",
+          "suffix": "m/s"
+        },
+        {
+          "name": "kilometers-per-hour",
+          "suffix": "km/h"
+        }
+      ]
+    },
+    {
+      "name": "acceleration",
+      "default_unit_type": "meters-per-second-per-second",
+      "units": [
+        {
+          "name": "meters-per-second-per-second",
+          "suffix": "m/s^2"
         }
       ]
     }

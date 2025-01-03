@@ -4,12 +4,24 @@
 // #TODO_dontcommit: why the filename?
 // #TODO_dontcommit: unreal types should be in a separate plugin I think. Others could just be in a third-party project
 
-#include "Quantity.decl.h"
+// #TODO_dontcommit: dimensions must be blueprint editable
+
+#include "Quantity.h"
 #include "Unit.h"
 
 #include <variant>
 
-#include "quantity.generated.h"
+#include "TypedDouble.generated.h"
+
+// #TODO_dontcommit should be in separate include file
+UENUM()
+enum class ESetSelectedUnitStrategy : uint8
+{
+	// Keep the numerical value the same while changing unit. E.g. for mass this will convert 3 grams to 3 kilograms
+	KeepNumericalValue,
+	// Keep the represented quantity the same. E.g. for mass this will convert 3 grams to 0.003 kilograms
+	KeepQuantityValue,
+};
 
 {% for quantity in quantities %}
 
@@ -19,7 +31,7 @@ UENUM()
 enum class E{{ cap_quantity }}Unit : uint8
 {
     {% for unit in quantity.units %}
-    {{ unit.name|capitalize }},
+    {{ unit.name|capitalize }} UMETA(DisplayName="{{ unit.suffix }}"),
     {% endfor %}
 };
 
@@ -42,7 +54,7 @@ using F{{ cap_quantity }}Unit = std::variant<
 {% endfor %}
 >;
 
-constexpr F{{ cap_quantity }}Unit Get{{ cap_quantity }}Unit(const E{{ cap_quantity }}Unit {{ cap_quantity }}Unit)
+constexpr F{{ cap_quantity }}Unit GetUnitVariant(const E{{ cap_quantity }}Unit {{ cap_quantity }}Unit)
 {
 	switch ({{ cap_quantity }}Unit)
 	{
@@ -50,7 +62,8 @@ constexpr F{{ cap_quantity }}Unit Get{{ cap_quantity }}Unit(const E{{ cap_quanti
         case E{{ cap_quantity }}Unit::{{ unit.name|capitalize }}:
 			return F{{ cap_quantity }}Unit{ SafeMath::Units::F{{ unit.name|capitalize }}{} };
 {% endfor %}
-        // #TODO_dontcommit: default case
+        default:
+            return F{{ cap_quantity }}Unit{ SafeMath::Units::F{{ quantity.default_unit_type|capitalize }}{} };
 	}
 }
 
@@ -61,22 +74,84 @@ struct F{{ cap_quantity }}
 
 	using DefaultUnitType = SafeMath::Units::F{{ quantity.default_unit_type|capitalize }};
 
-	using QuantityType = SafeMath::TQuantity<DefaultUnitType, double>;
+    using NumericType = double;
+
+	using QuantityType = SafeMath::TQuantity<DefaultUnitType, NumericType>;
+
+	using UnitEnumType = E{{ cap_quantity }}Unit;
+
+	static FName GetValuePropertyName()
+	{
+		return GET_MEMBER_NAME_CHECKED(F{{ cap_quantity }}, Value);
+	}
+
+	static FName GetSelectedUnitPropertyName()
+	{
+		return GET_MEMBER_NAME_CHECKED(F{{ cap_quantity }}, SelectedUnit);
+	}
 
 	F{{ cap_quantity }}() = default;
 
-	F{{ cap_quantity }}(QuantityType InValue) : Value(InValue.GetValue<DefaultUnitType>())
+	template <class CompatibleUnitType>
+	F{{ cap_quantity }}(SafeMath::TQuantity<CompatibleUnitType, NumericType> Quantity)
+		: Value(Quantity.template GetValue<DefaultUnitType>())
+#if WITH_EDITORONLY_DATA
+		, SelectedUnit(F{{ cap_quantity }}UnitTraits<CompatibleUnitType>::{{ cap_quantity }}Unit)
+#endif
 	{
+		static_assert(SafeMath::IsSameDimension(DefaultUnitType{}, CompatibleUnitType{}));
 	}
 
 	operator QuantityType() const
 	{
-		return GetValue();
+		return GetQuantity();
 	}
 
-	QuantityType GetValue() const
+	QuantityType GetQuantity() const
 	{
 		return QuantityType{DefaultUnitType{}, Value};
+	}
+
+    template <class UnitType>
+    NumericType GetValue() const
+    {
+        return GetQuantity().GetValue<UnitType>();
+    }
+
+#if WITH_EDITORONLY_DATA
+	E{{ cap_quantity }}Unit GetSelectedUnit() const
+	{
+		return SelectedUnit;
+	}
+
+	void SetSelectedUnit(E{{ cap_quantity }}Unit InSelectedUnit, ESetSelectedUnitStrategy SetSelectedUnitStrategy)
+	{
+		if (SetSelectedUnitStrategy == ESetSelectedUnitStrategy::KeepNumericalValue)
+		{
+			const auto FromUnitVariant = GetUnitVariant(SelectedUnit);
+			const auto ToUnitVariant = GetUnitVariant(InSelectedUnit);
+
+			std::visit(
+				[this](auto FromUnit, auto ToUnit)
+				{ Value = SafeMath::GetConversionRateBetween(ToUnit, FromUnit) * Value; },
+				FromUnitVariant,
+				ToUnitVariant);
+		}
+
+		SelectedUnit = InSelectedUnit;
+	}
+#endif
+
+	F{{ cap_quantity }}& operator*=(const NumericType Scalar)
+	{
+		Value *= Scalar;
+		return *this;
+	}
+
+	F{{ cap_quantity }}& operator/=(const NumericType Scalar)
+	{
+		Value /= Scalar;
+		return *this;
 	}
 
 private:
@@ -85,9 +160,29 @@ private:
 	double Value = 0.;
 
 #if WITH_EDITORONLY_DATA
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	E{{ cap_quantity }}Unit SelectedUnit = F{{ cap_quantity }}UnitTraits<DefaultUnitType>::{{ cap_quantity }}Unit;
 #endif
 };
+
+inline F{{ cap_quantity }} operator*(const F{{ cap_quantity }} {{ cap_quantity }}, const double Scalar)
+{
+	return F{{ cap_quantity }}{ {{ cap_quantity }} } *= Scalar;
+}
+
+inline F{{ cap_quantity }} operator*(const double Scalar, const F{{ cap_quantity }} {{ cap_quantity }})
+{
+	return {{ cap_quantity }} * Scalar;
+}
+
+inline F{{ cap_quantity }} operator/(const F{{ cap_quantity }} {{ cap_quantity }}, const double Scalar)
+{
+	return F{{ cap_quantity }}{ {{ cap_quantity }} } /= Scalar;
+}
+
+inline F{{ cap_quantity }} operator/(const double Scalar, const F{{ cap_quantity }} {{ cap_quantity }})
+{
+	return {{ cap_quantity }} / Scalar;
+}
 
 {% endfor %}

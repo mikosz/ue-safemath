@@ -24,16 +24,24 @@ struct Items {
 // Custom filter to capitalize the first letter of a string
 fn capitalize_filter(value: &Value, _: &HashMap<String, Value>) -> tera::Result<Value> {
     // Ensure the value is a string
-    let s = value
+    let string = value
         .as_str()
         .ok_or_else(|| tera::Error::msg("Expected a string for capitalize_filter"))?;
 
     // Capitalize the first letter
-    let mut c = s.chars();
-    let capitalized = match c.next() {
-        None => String::new(),
-        Some(first) => first.to_uppercase().collect::<String>() + c.as_str(),
-    };
+    let chars = string.chars();
+    let mut capitalize_next = true;
+    let capitalized = chars.fold(String::new(), |result: String, c: char| {
+        if c == '-' {
+            capitalize_next = true;
+            result
+        } else if capitalize_next {
+            capitalize_next = false;
+            result + c.to_uppercase().collect::<String>().as_str()
+        } else {
+            result + c.to_string().as_str()
+        }
+    });
 
     // Return the modified value
     Ok(Value::String(capitalized))
@@ -60,6 +68,11 @@ fn main() {
 
     match parse_and_feed("res/quantity.tera", "res/quantity-params.json") {
         Ok(gen) => std::fs::write("out/quantity.h", &gen).unwrap(),
+        Err(e) => println!("Error while parsing quantity: {}", e),
+    }
+
+    match parse_and_feed("res/register-custom-property-type-layouts.tera", "res/quantity-params.json") {
+        Ok(gen) => std::fs::write("out/RegisterCustomPropertyTypeLayouts.h", &gen).unwrap(),
         Err(e) => println!("Error while parsing quantity: {}", e),
     }
 }

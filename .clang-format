@@ -43,8 +43,6 @@ IncludeBlocks:   Regroup
 IncludeCategories:
   - Regex:           '.*\.generated\.h'
     Priority:        100
-  - Regex:           '.*Errant[A-z]+Utilities.*\.h'
-    Priority:        50
   - Regex:           '.*(PCH).*'
     Priority:        -1
   - Regex:           'CoreMinimal\.h'
@@ -109,7 +107,6 @@ RawStringFormats:
       - ParseTextProtoOrDie
     CanonicalDelimiter: ''
 ReflowComments:  false
-SeparateDefinitionBlocks: Always
 SortIncludes:    true
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: true
