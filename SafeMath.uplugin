@@ -28,6 +28,11 @@
 			"Name": "SafeMathEditor",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "SafeMathTemplates",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		}
 	]
 }

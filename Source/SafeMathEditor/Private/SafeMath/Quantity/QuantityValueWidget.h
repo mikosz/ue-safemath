@@ -1,8 +1,9 @@
 ﻿#pragma once
 
 #include "PropertyUtils.h"
-#include "SafeMath/TypedDouble.h"
 #include "Widgets/Input/SNumericEntryBox.h"
+
+#include <variant>
 
 #define LOCTEXT_NAMESPACE "SafeMath_QuantityValueWidget"
 

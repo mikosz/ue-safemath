@@ -17,7 +17,7 @@ struct Quantity {
 }
 
 #[derive(Deserialize, Serialize)]
-struct Items {
+struct Params {
     quantities: Vec<Quantity>,
 }
 
@@ -28,10 +28,17 @@ fn capitalize_filter(value: &Value, _: &HashMap<String, Value>) -> tera::Result<
         .as_str()
         .ok_or_else(|| tera::Error::msg("Expected a string for capitalize_filter"))?;
 
-    // Capitalize the first letter
+    let capitalized = capitalize(&string);
+
+    // Return the modified value
+    Ok(Value::String(capitalized))
+}
+
+fn capitalize(string: &str) -> String {
     let chars = string.chars();
     let mut capitalize_next = true;
-    let capitalized = chars.fold(String::new(), |result: String, c: char| {
+
+    chars.fold(String::new(), |result: String, c: char| {
         if c == '-' {
             capitalize_next = true;
             result
@@ -41,17 +48,16 @@ fn capitalize_filter(value: &Value, _: &HashMap<String, Value>) -> tera::Result<
         } else {
             result + c.to_string().as_str()
         }
-    });
-
-    // Return the modified value
-    Ok(Value::String(capitalized))
+    })
 }
 
-fn parse_and_feed(template_file: &str, params_file: &str) -> Result<String, Box<dyn Error>> {
-    let template = std::fs::read_to_string(template_file)?;
+fn deserialize_params(params_file: &str) -> Result<Params, Box<dyn Error>> {
     let params_str = std::fs::read_to_string(params_file)?;
-    let items: Items = serde_json::from_str(&params_str)?;
+    Ok(serde_json::from_str(&params_str)?)
+}
 
+fn generate(template_file: &str, items: impl Serialize) -> Result<String, Box<dyn Error>> {
+    let template = std::fs::read_to_string(template_file)?;
     let context = Context::from_serialize(&items)?;
 
     let mut tera = Tera::new("res/**/*")?;
@@ -64,15 +70,28 @@ fn parse_and_feed(template_file: &str, params_file: &str) -> Result<String, Box<
 }
 
 fn main() {
-    std::fs::create_dir_all("out/").unwrap();
+    let params = deserialize_params("res/quantity-params.json").unwrap();
 
-    match parse_and_feed("res/quantity.tera", "res/quantity-params.json") {
-        Ok(gen) => std::fs::write("out/quantity.h", &gen).unwrap(),
-        Err(e) => println!("Error while parsing quantity: {}", e),
+    for quantity in &params.quantities {
+        match generate("res/quantity.tera", &quantity) {
+            Ok(gen) => std::fs::write(
+                format!(
+                    "../SafeMath/Public/SafeMath/Quantity/{}.h",
+                    capitalize(&quantity.name)
+                ),
+                &gen,
+            )
+            .unwrap(),
+            Err(e) => println!("Error while parsing quantity: {}", e),
+        }
     }
 
-    match parse_and_feed("res/register-custom-property-type-layouts.tera", "res/quantity-params.json") {
-        Ok(gen) => std::fs::write("out/RegisterCustomPropertyTypeLayouts.h", &gen).unwrap(),
+    match generate("res/register-custom-property-type-layouts.tera", &params) {
+        Ok(gen) => std::fs::write(
+            "../SafeMathEditor/Private/SafeMath/Quantity/RegisterCustomPropertyTypeLayouts.cpp",
+            &gen,
+        )
+        .unwrap(),
         Err(e) => println!("Error while parsing quantity: {}", e),
     }
 }

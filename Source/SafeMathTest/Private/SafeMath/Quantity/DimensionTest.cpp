@@ -1,5 +1,5 @@
 ﻿#include "Misc/AutomationTest.h"
-#include "SafeMath/Dimension.h"
+#include "SafeMath/Quantity/Dimension.h"
 
 #include <type_traits>
 

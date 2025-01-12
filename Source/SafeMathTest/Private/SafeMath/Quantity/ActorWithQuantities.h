@@ -2,8 +2,10 @@
 
 #include <CoreMinimal.h>
 
-#include "SafeMath/TypedDouble.h"
-
+#include "SafeMath/Quantity/Acceleration.h"
+#include "SafeMath/Quantity/Area.h"
+#include "SafeMath/Quantity/Length.h"
+#include "SafeMath/Quantity/Mass.h"
 #include "ActorWithQuantities.generated.h"
 
 UCLASS()

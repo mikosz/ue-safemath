@@ -1,6 +1,6 @@
 ﻿#include "Misc/AutomationTest.h"
-#include "SafeMath/Quantity.h"
-#include "SafeMath/Utils.h"
+#include "SafeMath/Quantity/Quantity.h"
+#include "SafeMath/Quantity/Utils.h"
 
 #include <type_traits>
 

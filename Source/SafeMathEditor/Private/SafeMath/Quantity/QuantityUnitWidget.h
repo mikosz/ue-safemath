@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "PropertyUtils.h"
-#include "SafeMath/TypedDouble.h"
+#include "SafeMath/Quantity/SetSelectedUnitStrategy.h"
 #include "Widgets/Input/STextComboBox.h"
 
 #define LOCTEXT_NAMESPACE "SafeMath_QuantityUnitWidget"

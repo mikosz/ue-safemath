@@ -1,5 +1,5 @@
 ﻿#include "Misc/AutomationTest.h"
-#include "SafeMath/Unit.h"
+#include "SafeMath/Quantity/Unit.h"
 
 #include <type_traits>
 

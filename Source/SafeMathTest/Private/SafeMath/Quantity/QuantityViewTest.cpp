@@ -1,7 +1,7 @@
 #include "Misc/AutomationTest.h"
-#include "SafeMath/QuantityView.h"
-#include "SafeMath/Unit.h"
-#include "SafeMath/Utils.h"
+#include "SafeMath/Quantity/QuantityView.h"
+#include "SafeMath/Quantity/Unit.h"
+#include "SafeMath/Quantity/Utils.h"
 
 #include <type_traits>
 

@@ -2,7 +2,7 @@
 // Distributed under the Apache 2.0 license (See accompanying file LICENSE)
 
 #include "Misc/AutomationTest.h"
-#include "SafeMath/Private/ConstexprList.h"
+#include "SafeMath/Quantity/ConstexprList.h"
 
 #include <type_traits>
 

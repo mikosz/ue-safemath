@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SafeMath/Private/ConstexprList.h"
+#include "ConstexprList.h"
 
 namespace SafeMath
 {

@@ -1,10 +1,11 @@
-#pragma once
-
-#include "CoreMinimal.h"
+#include "RegisterCustomPropertyTypeLayouts.h"
 
 #include "QuantityCustomization.h"
-#include "SafeMath/Quantity.h"
-#include "SafeMath/Unit.h"
+
+{% for quantity in quantities %}
+{% set cap_quantity = quantity.name|capitalize %}
+#include "SafeMath/Quantity/{{ cap_quantity }}.h"
+{% endfor %}
 
 namespace SafeMath::Editor
 {

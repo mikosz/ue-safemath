@@ -2,7 +2,7 @@
 
 #include "Quantity.decl.h"
 #include "QuantityBase.decl.h"
-#include "SafeMath/Utils.h"
+#include "SafeMath/Quantity/Utils.h"
 
 namespace SafeMath
 {

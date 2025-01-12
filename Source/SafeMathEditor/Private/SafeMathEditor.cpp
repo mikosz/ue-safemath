@@ -1,7 +1,7 @@
 ﻿#include "SafeMathEditor.h"
 
-#include "QuantityCustomization.h"
-#include "RegisterCustomPropertyTypeLayouts.h"
+#include "SafeMath/Quantity/QuantityCustomization.h"
+#include "SafeMath/Quantity/RegisterCustomPropertyTypeLayouts.h"
 
 #define LOCTEXT_NAMESPACE "FSafeMathEditorModule"
 
