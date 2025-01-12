@@ -6,11 +6,13 @@
       "units": [
         {
           "name": "degrees",
-          "suffix": "deg"
+          "suffix": "deg",
+          "literal_suffix": "deg"
         },
         {
           "name": "radians",
-          "suffix": "rad"
+          "suffix": "rad",
+          "literal_suffix": "rad"
         }
       ]
     },
@@ -20,15 +22,18 @@
       "units": [
         {
           "name": "centimeters",
-          "suffix": "cm"
+          "suffix": "cm",
+          "literal_suffix": "cm"
         },
         {
           "name": "meters",
-          "suffix": "m"
+          "suffix": "m",
+          "literal_suffix": "m"
         },
         {
           "name": "kilometers",
-          "suffix": "km"
+          "suffix": "km",
+          "literal_suffix": "km"
         }
       ]
     },
@@ -38,11 +43,13 @@
       "units": [
         {
           "name": "grams",
-          "suffix": "g"
+          "suffix": "g",
+          "literal_suffix": "g"
         },
         {
           "name": "kilograms",
-          "suffix": "kg"
+          "suffix": "kg",
+          "literal_suffix": "kg"
         }
       ]
     },
@@ -52,11 +59,13 @@
       "units": [
         {
           "name": "centimeters-squared",
-          "suffix": "cm^2"
+          "suffix": "cm^2",
+          "literal_suffix": "cm2"
         },
         {
           "name": "meters-squared",
-          "suffix": "m^2"
+          "suffix": "m^2",
+          "literal_suffix": "m2"
         }
       ]
     },
@@ -66,11 +75,13 @@
       "units": [
         {
           "name": "seconds",
-          "suffix": "s"
+          "suffix": "s",
+          "literal_suffix": "s"
         },
         {
           "name": "hours",
-          "suffix": "h"
+          "suffix": "h",
+          "literal_suffix": "h"
         }
       ]
     },
@@ -80,11 +91,13 @@
       "units": [
         {
           "name": "meters-per-second",
-          "suffix": "m/s"
+          "suffix": "m/s",
+          "literal_suffix": "mps"
         },
         {
           "name": "kilometers-per-hour",
-          "suffix": "km/h"
+          "suffix": "km/h",
+          "literal_suffix": "kmph"
         }
       ]
     },
@@ -94,7 +107,8 @@
       "units": [
         {
           "name": "meters-per-second-per-second",
-          "suffix": "m/s^2"
+          "suffix": "m/s^2",
+          "literal_suffix": "mps2"
         }
       ]
     }

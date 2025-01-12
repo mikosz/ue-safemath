@@ -1,0 +1,23 @@
+#pragma once
+
+#include "Quantity.h"
+
+namespace SafeMath::QuantityLiterals
+{
+
+{% for quantity in quantities %}
+{% for unit in quantity.units %}
+{% set cap_unit = unit.name|capitalize %}
+inline TQuantity<Units::F{{ cap_unit }}, double> operator""_{{ unit.literal_suffix }}(long double Value)
+{
+	return TQuantity{Units::F{{ cap_unit }}{}, static_cast<double>(Value)};
+}
+
+inline TQuantity<Units::F{{ cap_unit }}, double> operator""_{{ unit.literal_suffix }}(unsigned long long Value)
+{
+	return TQuantity{Units::F{{ cap_unit }}{}, static_cast<double>(Value)};
+}
+{% endfor %}
+{% endfor %}
+
+}  // namespace SafeMath::QuantityLiterals

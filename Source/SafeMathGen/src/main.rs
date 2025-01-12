@@ -7,6 +7,7 @@ use tera::{Context, Tera, Value};
 struct Unit {
     name: String,
     suffix: String,
+    literal_suffix: String,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -84,6 +85,15 @@ fn main() {
             .unwrap(),
             Err(e) => println!("Error while parsing quantity: {}", e),
         }
+    }
+
+    match generate("res/quantity-literals.tera", &params) {
+        Ok(gen) => std::fs::write(
+            "../SafeMathTemplates/Public/SafeMath/Quantity/QuantityLiterals.h",
+            &gen,
+        )
+        .unwrap(),
+        Err(e) => println!("Error while parsing quantity: {}", e),
     }
 
     match generate("res/register-custom-property-type-layouts.tera", &params) {
