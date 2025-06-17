@@ -1,6 +1,9 @@
 ﻿#pragma once
 
+#include "MetaDataHelpers.h"
+#include "NumericPropertyParams.h"
 #include "PropertyUtils.h"
+#include "SafeMathEditorLog.h"
 #include "Widgets/Input/SNumericEntryBox.h"
 
 #include <variant>
@@ -31,6 +34,10 @@ private:
 
 	using DefaultUnitType = typename QuantityStructType::DefaultUnitType;
 
+	using MetaDataGetterType = typename TNumericPropertyParams<NumericType>::FMetaDataGetter;
+
+	MetaDataGetterType MetaDataGetter;
+
 	TSharedPtr<IPropertyHandle> PropertyHandle;
 
 	TOptional<NumericType> DoGetValue() const;
@@ -46,6 +53,13 @@ void SQuantityValueWidget<NumericType>::Construct(
 {
 	PropertyHandle = InPropertyHandle;
 
+	MetaDataGetter = MetaDataGetterType::CreateLambda(
+		[&](const FName& Key) -> const FString&
+		{
+			const FString* InstanceValue = PropertyHandle->GetInstanceMetaData(Key);
+			return (InstanceValue != nullptr) ? *InstanceValue : PropertyHandle->GetMetaData(Key);
+		});
+
 	SNumericEntryBox<NumericType>::Construct(typename SNumericEntryBox<NumericType>::FArguments{}
 												 .Font(Args._Font)
 												 .Value_Raw(this, &SQuantityValueWidget::DoGetValue)
@@ -59,6 +73,8 @@ template <class QuantityStructType>
 void SQuantityValueWidget<QuantityStructType>::DoOnValueCommitted(
 	const NumericType NewValue, ETextCommit::Type CommitType) const
 {
+	using namespace Private;
+
 	const TSharedPtr<IPropertyHandle> ValuePropertyHandle =
 		PropertyHandle->GetChildHandle(QuantityStructType::GetValuePropertyName());
 	const TSharedPtr<IPropertyHandle> SelectedUnitPropertyHandle =
@@ -76,10 +92,37 @@ void SQuantityValueWidget<QuantityStructType>::DoOnValueCommitted(
 		return;
 	}
 
+	const FText PropertyDisplayName = PropertyHandle->GetPropertyDisplayName();
+
+	const FString& ForceUnits = MetaDataGetter.Execute("ForceUnits");
+	const FString& Units = MetaDataGetter.Execute("Units");
+	const FString& ClampMin = MetaDataGetter.Execute("ClampMin");
+	const FString& ClampMax = MetaDataGetter.Execute("ClampMax");
+	const FString& UIMin = MetaDataGetter.Execute("UIMin");
+	const FString& UIMax = MetaDataGetter.Execute("UIMax");
+
+	// #TODO_dontcommit
+	const FString& Dummy = MetaDataGetter.Execute("Dummy");
+
+	if (!ForceUnits.IsEmpty() && !Units.IsEmpty())
+	{
+		UE_LOG(
+			LogSafeMathEditor,
+			Warning,
+			TEXT("Property %s has both Units and ForceUnits set. Entry for Units will be ignored."),
+			*PropertyDisplayName.ToString());
+	}
+
+	TOptional ClampMinValue =
+		GetLimitValue<NumericType>(ClampMin, Units, ForceUnits, PropertyDisplayName, TEXT("ClampMin"));
+	TOptional ClampMaxValue =
+		GetLimitValue<NumericType>(ClampMax, Units, ForceUnits, PropertyDisplayName, TEXT("ClampMax"));
+	TOptional UIMinValue = GetLimitValue<NumericType>(UIMin, Units, ForceUnits, PropertyDisplayName, TEXT("UIMin"));
+	TOptional UIMaxValue = GetLimitValue<NumericType>(UIMax, Units, ForceUnits, PropertyDisplayName, TEXT("UIMax"));
+
 	const auto SelectedUnitVariant = GetUnitVariant(CommonSelectedUnit.GetValue());
 	const NumericType ConversionRate = std::visit(
-		[](auto SelectedUnit)
-		{ return GetConversionRateBetween(SelectedUnit, DefaultUnitType{}); },
+		[](auto SelectedUnit) { return GetConversionRateBetween(SelectedUnit, DefaultUnitType{}); },
 		SelectedUnitVariant);
 	const NumericType NewPropertyValue = ConversionRate * NewValue;
 
@@ -90,8 +133,7 @@ void SQuantityValueWidget<QuantityStructType>::DoOnValueCommitted(
 	}
 
 	{
-		FScopedTransaction Transaction{
-			FText::Format(LOCTEXT("SetValue", "Edit {0}"), PropertyHandle->GetPropertyDisplayName())};
+		FScopedTransaction Transaction{FText::Format(LOCTEXT("SetValue", "Edit {0}"), PropertyDisplayName)};
 		SetPropertyValue(*ValuePropertyHandle, NewPropertyValue);
 	}
 }
@@ -140,8 +182,7 @@ TOptional<typename SQuantityValueWidget<QuantityStructType>::NumericType> SQuant
 
 	const auto SelectedUnitVariant = GetUnitVariant(CommonSelectedUnit.GetValue());
 	const NumericType ConversionRate = std::visit(
-		[](auto SelectedUnit)
-		{ return GetConversionRateBetween(DefaultUnitType{}, SelectedUnit); },
+		[](auto SelectedUnit) { return GetConversionRateBetween(DefaultUnitType{}, SelectedUnit); },
 		SelectedUnitVariant);
 
 	return ConversionRate * CommonValue.GetValue();

@@ -1,4 +1,4 @@
-﻿// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright 2025 Mikołaj Radwan, All Rights Reserved.
 
 #include "SafeMath.h"
 
@@ -16,5 +16,5 @@ void FSafeMathModule::ShutdownModule()
 }
 
 #undef LOCTEXT_NAMESPACE
-	
+
 IMPLEMENT_MODULE(FSafeMathModule, SafeMath)

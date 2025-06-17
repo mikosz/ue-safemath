@@ -36,4 +36,13 @@ bool IsNearlyEqual(const T& LHS, const T& RHS)
 	}
 }
 
+template <class T>
+T Parse(const FString& String);
+
+template <>
+float Parse<float>(const FString& String);
+
+template <>
+double Parse<double>(const FString& String);
+
 }  // namespace SafeMath

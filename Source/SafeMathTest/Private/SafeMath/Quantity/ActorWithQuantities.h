@@ -12,17 +12,18 @@
 
 using namespace SafeMath::QuantityLiterals;
 
-UCLASS() class AActorWithQuantities : public AActor
+UCLASS()
+class AActorWithQuantities : public AActor
 {
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditAnywhere)
 	FLength Length = 20_cm;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 7, Units = "g"))
 	FMass Mass = 0.3_kg;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 7, Dummy = "abc"))
 	FAcceleration Acceleration = 9.81_mps2;
 
 	UPROPERTY(EditAnywhere)
